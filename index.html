@@ -3,7 +3,7 @@
 <center><textarea rows="20" cols="100" id="input"></textarea></center>
 <center><textarea rows="20" cols="100" id="output" readonly=true></textarea></center>
 <script>
-    function onClick() {
+function onClick() {
         document.getElementById("output").value = "";
         var lines = document.getElementById("input").value.split("\n");
         var newLines = [];
@@ -37,7 +37,7 @@
                             if (characters[i - 1] != "'") {
                                 newLine = newLine + "'";
                             }
-                        } else {
+                        } else if (i != lastSpot && i != firstSpot) {
                             if (characters[i + 1] != "'" && characters[i - 1] != "'") {
                                 newLine = newLine + "'";
                             }
@@ -52,6 +52,5 @@
             document.getElementById("output").value = document.getElementById("output").value + line + "\n";
         });
     }
-
 </script>
 
