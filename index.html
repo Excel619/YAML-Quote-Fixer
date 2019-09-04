@@ -12,6 +12,12 @@
             var foundFirst = false;
             var firstSpot;
             var newLine = "";
+        	var lastSpot;
+        	for (i = 0; i < characters.length; i++) {
+            	if (characters[i] == "'") {
+                	lastSpot = i;
+                }
+            }
             for (i = 0; i < characters.length; i++) {
                 var character = characters[i];
                 if (character == "'") {
@@ -27,7 +33,7 @@
                             if (characters[i + 1] != "'") {
                                 newLine = newLine + "'";
                             }
-                        } else if (i == characters.length - 2) {
+                        } else if (i == lastSpot - 1) {
                             if (characters[i - 1] != "'") {
                                 newLine = newLine + "'";
                             }
