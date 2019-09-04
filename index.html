@@ -1,0 +1,52 @@
+<center><h1>YAML Quote Fixer</h1></center>
+<center><button onclick="onClick()">fix quotes</button></center>
+<center><textarea rows="20" cols="100" id="input"></textarea></center>
+<center><textarea rows="20" cols="100" id="output" readonly=true></textarea></center>
+<script>
+    function onClick() {
+        document.getElementById("output").value = "";
+        var lines = document.getElementById("input").value.split("\n");
+        var newLines = [];
+        lines.forEach(function(line) {
+            var characters = line.split("");
+            var foundFirst = false;
+            var newLine = "";
+            for (i = 0; i < characters.length; i++) {
+                var character = characters[i];
+                if (character == "'") {
+                    if (foundFirst && i == characters.length - 1) {
+                        newLine = newLine + "'";
+                        break;
+                    }
+                    if (foundFirst == false) {
+                        foundFirst = true;
+                    } else if (i != characters.length - 1) {
+                        if (i == 1) {
+                            if (characters[i + 1] != "'") {
+                                newLine = newLine + "'";
+                            }
+                        } else if (i == characters.length - 2) {
+                        	if (characters[i - 1] != "'") {
+                            	newLine = newLine + "'";
+                            }
+                        } else {
+                            if (characters[i + 1] != "'" && characters[i - 1] != "'") {
+                                newLine = newLine + "'";
+                            }
+                        }
+                    } else {
+                        newLine = line;
+                        break;
+                    }
+                }
+                newLine = newLine + character;
+            }
+            newLines[newLines.length] = newLine;
+        });
+        newLines.forEach(function(line) {
+            document.getElementById("output").value = document.getElementById("output").value + line + "\n";
+        });
+    }
+
+</script>
+
