@@ -10,6 +10,7 @@
         lines.forEach(function(line) {
             var characters = line.split("");
             var foundFirst = false;
+            var firstSpot;
             var newLine = "";
             for (i = 0; i < characters.length; i++) {
                 var character = characters[i];
@@ -20,23 +21,21 @@
                     }
                     if (foundFirst == false) {
                         foundFirst = true;
+                        firstSpot = i;
                     } else if (i != characters.length - 1) {
-                        if (i == 1) {
+                        if (i == firstSpot + 1) {
                             if (characters[i + 1] != "'") {
                                 newLine = newLine + "'";
                             }
                         } else if (i == characters.length - 2) {
-                        	if (characters[i - 1] != "'") {
-                            	newLine = newLine + "'";
+                            if (characters[i - 1] != "'") {
+                                newLine = newLine + "'";
                             }
                         } else {
                             if (characters[i + 1] != "'" && characters[i - 1] != "'") {
                                 newLine = newLine + "'";
                             }
                         }
-                    } else {
-                        newLine = line;
-                        break;
                     }
                 }
                 newLine = newLine + character;
