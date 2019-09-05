@@ -16,6 +16,8 @@ function onClick() {
         	for (i = 0; i < characters.length; i++) {
             	if (characters[i] == "'") {
                 	lastSpot = i;
+                } else if (characters[i] == "#") {
+                	break;
                 }
             }
             for (i = 0; i < characters.length; i++) {
