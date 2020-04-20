@@ -1,0 +1,217 @@
+<head>
+	<script src="js-yaml.js"></script>
+</head>
+<body>
+	<center><h1>Quest YAML Validator</h1><center>
+	<center><a href="excel619.github.io">Click here for the YAML quote fixer</a></center>
+	<center><button onclick="onClick()">check yaml</button></center>
+	<center><textarea rows="20" cols="100" id="input"></textarea></center>
+	<center><textarea rows="20" cols="100" id="output" readonly=true></textarea></center>
+	<script type="text/javascript">
+function onClick() {
+	try {
+		var doc = jsyaml.load(document.getElementById("input").value);
+	} catch (error) {
+		document.getElementById("output").innerHTML = "You have a YAML syntax error!\nUse this website to fix your syntax errors, and then use this tool: https://onlineyamltools.com/validate-yaml (this is the best tool for checking, it can find mistakes that other tools won't find).";
+		return;
+	}
+	if (doc == {}) {
+		document.getElementById("output").innerHTML = "You have a YAML syntax error!\nUse this website to fix your syntax errors, and then use this tool: https://onlineyamltools.com/validate-yaml (this is the best tool for checking, it can find mistakes that other tools won't find).";
+		return;
+	}
+	var output = "";
+
+	output += checkKey(doc, "name");
+	output += checkKey(doc, "unique-id");
+	output += checkKey(doc, "repeatable");
+	output += checkKeyWithOtherKeyValue(doc, "repeatable", true, "cooldown");
+	output += checkKey(doc, "requirements");
+	output += checkKey(doc, "first-npc");
+	output += checkKey(doc, "objectives");
+	output += checkKey(doc, "rewards");
+	output += checkSubKeysForOptions(doc, "", ["name", "unique-id", "repeatable", "requirements", "first-npc", "objectives", "rewards"]);
+
+	output += checkKey(doc, "requirements.level");
+	output += checkKey(doc, "requirements.level-not-met");
+	output += checkKeyIfOtherKeysExist(doc, ["requirements.blacksmith-level", "requirements.hunter-level", "requirements.enchanter-level", "requirements.jeweling-level", "requirements.alchemist-level", "requirements.crafting-level"], "requirements.crafting-level-not-met");
+	output += checkKeyIfOtherKeysExist(doc, ["requirements.required-quests"], "requirements.required-quests-not-met");
+	output += checkKeyIfOtherKeysExist(doc, ["requirements.class"], "requirements.class-not-met");
+	output += checkSubKeysForOptions(doc, "requirements", ["level", "level-not-met", " blacksmith-level", "hunter-level", "enchanter-level", "jeweling-level", "alchemist-level", "crafting-level", "crafting-level-not-met", "class", "class-not-met", "required-quests", "required-quests-not-met"]);
+
+	output += checkKey(doc, "first-npc.npc-name");
+	output += checkKey(doc, "first-npc.npc-id");
+	output += checkKey(doc, "first-npc.speech");
+	output += checkSubKeysForOptions(doc, "first-npc", ["npc-name", "npc-id", "speech", "quest-completed-message", "execute"]);
+
+	output += checkKey(doc, "rewards.exp");
+	output += checkKey(doc, "rewards.quest-points");
+	output += checkKey(doc, "rewards.money");
+	output += checkSubKeysForOptions(doc, "rewards", ["exp", "quest-points", "money", "execute"]);
+
+	if (hasKey(doc, "objectives")) {
+		var objectives = Object.keys(getKey(doc, "objectives"));
+		for (var i = 0; i < objectives.length; i++) {
+			var objective = "objectives." + objectives[i];
+			output += checkKey(doc, objective + ".requirement");
+			output += checkKey(doc, objective + ".requirement.type");
+			output += checkKey(doc, objective + ".goal-message");
+			if (hasKey(doc, objective + ".requirement.type")) {
+				if (getKey(doc, objective + ".requirement.type") == "slay") {
+					output += checkKey(doc, objective + ".requirement.mob-names");
+					output += checkKey(doc, objective + ".requirement.amount");
+					output += checkSubKeysForOptions(doc, objective + ".requirement", ["mob-names", "amount", "requires", "type"]);
+				} else if (getKey(doc, objective + ".requirement.type") == "talk") {
+					output += checkKey(doc, objective + ".requirement.npc");
+					output += checkKey(doc, objective + ".requirement.npc.npc-name");
+					output += checkKey(doc, objective + ".requirement.npc.npc-id");
+					output += checkKey(doc, objective + ".requirement.npc.speech");
+					if (hasKey(doc, objective + ".requirement.npc.idle-messages")) {
+						var idleMessages = Object.keys(getKey(doc, objective + ".requirement.npc.idle-messages"));
+						for (var j = 0; j < idleMessages.length; j++) {
+							var idleMessage = objective + ".requirement.npc.idle-messages." + idleMessage[j];
+							output += checkKey(doc, idleMessage + ".speech");
+							output += checkKey(doc, idleMessage + ".contidion");
+							if (hasKey(doc, idleMessage + ".condition.quest")) {
+								output += checkSubKeysForOptions(doc, idleMessage + ".condition.quest", ["start", "completed"]);
+							}
+							if (hasKey(doc, idleMessage + ".condition.objectives")) {
+								output += checkSubKeysNumbers(doc, idleMessage + ".condition.objectives");
+							}
+							output += checkSubKeysForOptions(doc, idleMessage + ".condition", ["quest", "quest-items", "objectives"]);
+						}
+					}
+					output += checkSubKeysForOptions(doc, objective + ".requirement.npc", ["npc-name", "npc-id", "speech", "idle-messages"]);
+					output += checkSubKeysForOptions(doc, objective + ".requirement", ["npc", "requires", "type"]);
+				} else if (getKey(doc, objective + ".requirement.type") == "location") {
+					output += checkKey(doc, objective + ".requirement.location-type");
+					if (hasKey(doc, objective + ".requirement.location-type")) {
+						if (getKey(doc, objective + ".requirement.location-type") == "radius") {
+							output += checkKey(doc, objective + ".requirement.location");
+							output += checkKey(doc, objective + ".requirement.radius");
+							output += checkSubKeysForOptions(doc, objective + ".requirement", ["location-type", "requires", "type", "location", "radius"]);
+						} else if (getKey(doc, objective + ".requirement.location-type") == "box") {
+							output += checkKey(doc, objective + ".requirement.corner-one");
+							output += checkKey(doc, objective + ".requirement.corner-two");
+							output += checkSubKeysForOptions(doc, objective + ".requirement", ["location-type", "requires", "type", "corner-one", "corner-two"]);
+						} else {
+							output += "FATAL - Bad key (must be either 'radius' or 'box': " + objective + ".requirement.location-type\n";
+						}
+					}
+				} else if (getKey(doc, objective + ".requirement.type") == "break") {
+					output += checkKey(doc, objective + ".requirement.block-type");
+					output += checkSubKeysForOptions(doc, objective + ".requirement", ["block-type", "type", "amount", "location"]);
+				} else {
+					output += "FATAL - Bad key (must be either 'slay', 'talk', 'location' or 'break'): " + objective + ".requirement.type\n";
+				}
+				if (hasKey(doc, objective + ".requires")) {
+					var items = Object.keys(getKey(doc, objective + ".requirement.requires"));
+					for (var j = 0; j < items.length; j++) {
+						var item = objective + ".requirement.requires." + items[j];
+						output += checkKey(doc, item + ".item-type");
+						output += checkKey(doc, item + ".item-name");
+						output += checkKey(doc, item + ".item-count");
+					}
+				}
+			}
+			output += checkSubKeysForOptions(doc, objective, ["requirement", "goal-message", "completed-message", "goal-location", "execute"]);
+		}
+		output += checkSubKeysNumbers(doc, "objectives");
+	}
+	if (output != "") {
+		document.getElementById("output").innerHTML = output;
+	} else {
+		document.getElementById("output").innerHTML = "Looks all good to me!";
+	}
+}
+
+function checkSubKeysNumbers(doc, key) {
+	if (hasKey(doc, key)) {
+		var keys = Object.keys(getKey(doc, key));
+		for (var i = 0; i < keys.length; i++) {
+			if (isNaN(keys[i])) {
+				return "FATAL - Bad key (should be number): " + keys[i] + "\n";
+			}
+		}
+	}
+	return "";
+}
+
+function hasKey(doc, key) {
+	var check = "doc[\"";
+	var split = key.split(".");
+	for (i = 0; i < split.length; i++) {
+		if (i != split.length - 1) {
+			check += split[i] + "\"][\"";
+		} else {
+			check += split[i] + "\"]";
+		}
+	}
+	try {
+		if (eval(check) == null) {
+			return false;
+		}
+	} catch (error) {
+		return false;
+	}
+	return true;
+}
+function getKey(doc, key) {
+	if (key != "") {
+		var check = "doc[\"";
+		var split = key.split(".");
+		for (var i = 0; i < split.length; i++) {
+			if (i != split.length - 1) {
+				check += split[i] + "\"][\"";
+			} else {
+				check += split[i] + "\"]";
+			}
+		}
+		try {
+			if (eval(check) != null) {
+				return eval(check);
+			}
+		} catch (error) {
+			return null;
+		}
+		return null;
+	}
+	return doc;
+}
+function checkKey(doc, key) {
+	if (!hasKey(doc, key)) {
+		return "FATAL - Missing key: " + key + "\n";
+	}
+	return "";
+}
+function checkKeyIfOtherKeysExist(doc, firstKeys, key) {
+	for (var i = 0; i < firstKeys.length; i++) {
+		if (hasKey(doc, firstKeys[i])) {
+			if (!hasKey(doc, key)) {
+				return "FATAL - Missing key: " + key + "\n";
+			}
+		}
+	}
+	return "";
+}
+function checkKeyWithOtherKeyValue(doc, firstKey, value, key) {
+	if (getKey(doc, firstKey) == value) {
+		if (!hasKey(doc, key)) {
+			return "FATAL - Missing key: " + key + "\n";
+		}
+	}
+	return "";
+}
+function checkSubKeysForOptions(doc, key, options) {
+	var out = "";
+	if (hasKey(doc, key)) {
+		var keys = Object.keys(getKey(doc, key));
+		for (var i = 0; i < keys.length; i++) {
+			if (!options.includes(keys[i])) {
+				out += "WARNING - Unknown key: " + key + "." + keys[i] + "\n";
+			}
+		}
+	}
+	return out;
+}
+</script>
+</body>
