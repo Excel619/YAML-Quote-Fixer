@@ -37,7 +37,7 @@ function onClick() {
 	output += checkKeyIfOtherKeysExist(doc, ["requirements.blacksmith-level", "requirements.hunter-level", "requirements.enchanter-level", "requirements.jeweling-level", "requirements.alchemist-level", "requirements.crafting-level"], "requirements.crafting-level-not-met");
 	output += checkKeyIfOtherKeysExist(doc, ["requirements.required-quests"], "requirements.required-quests-not-met");
 	output += checkKeyIfOtherKeysExist(doc, ["requirements.class"], "requirements.class-not-met");
-	output += checkSubKeysForOptions(doc, "requirements", ["level", "level-not-met", " blacksmith-level", "hunter-level", "enchanter-level", "jeweling-level", "alchemist-level", "crafting-level", "crafting-level-not-met", "class", "class-not-met", "required-quests", "required-quests-not-met"]);
+	output += checkSubKeysForOptions(doc, "requirements", ["level", "level-not-met", "blacksmith-level", "hunter-level", "enchanter-level", "jeweling-level", "alchemist-level", "crafting-level", "crafting-level-not-met", "class", "class-not-met", "required-quests", "required-quests-not-met"]);
 
 	output += checkKey(doc, "first-npc.npc-name");
 	output += checkKey(doc, "first-npc.npc-id");
