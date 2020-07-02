@@ -69,7 +69,7 @@ function onClick() {
 					if (hasKey(doc, objective + ".requirement.npc.idle-messages")) {
 						var idleMessages = Object.keys(getKey(doc, objective + ".requirement.npc.idle-messages"));
 						for (var j = 0; j < idleMessages.length; j++) {
-							var idleMessage = objective + ".requirement.npc.idle-messages." + idleMessage[j];
+							var idleMessage = objective + ".requirement.npc.idle-messages." + idleMessages[j];
 							output += checkKey(doc, idleMessage + ".speech");
 							output += checkKey(doc, idleMessage + ".contidion");
 							if (hasKey(doc, idleMessage + ".condition.quest")) {
